@@ -6,9 +6,9 @@ import 'account_page.dart';
 import 'home_page.dart';
 
 class TabPage extends StatefulWidget {
-//  final FirebaseUser user;
+  final FirebaseUser user;
 
-//  TabPage(this.user);
+  TabPage(this.user);
 
   @override
   _TabPageState createState() => _TabPageState();
@@ -23,9 +23,9 @@ class _TabPageState extends State<TabPage> {
   void initState() {
     super.initState();
     _pages = [
-      HomePage(),
-      SearchPage(),
-      AccountPage()
+      HomePage(widget.user),
+      SearchPage(widget.user),
+      AccountPage(widget.user)
     ];
   }
 
