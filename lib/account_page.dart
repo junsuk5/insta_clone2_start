@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AccountPage extends StatelessWidget {
-  final FirebaseUser user;
+  final User user;
 
   AccountPage(this.user);
 
@@ -14,7 +14,7 @@ class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar() as PreferredSizeWidget?,
       body: _buildBody(),
     );
   }
@@ -46,7 +46,7 @@ class AccountPage extends StatelessWidget {
                   child: GestureDetector(
                     onTap: () => print('이미지 클릭'),
                     child: CircleAvatar(
-                      backgroundImage: NetworkImage(user.photoUrl),
+                      backgroundImage: NetworkImage(user.photoURL!),
                     ),
                   ),
                 ),
@@ -83,7 +83,7 @@ class AccountPage extends StatelessWidget {
               padding: EdgeInsets.all(8.0),
             ),
             Text(
-              user.displayName,
+              user.displayName!,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             )
@@ -96,7 +96,7 @@ class AccountPage extends StatelessWidget {
               builder: (context, snapshot) {
                 var post = 0;
                 if (snapshot.hasData) {
-                  post = snapshot.data.documents.length;
+                  post = snapshot.data!.docs.length;
                 }
 
                 return Text(
@@ -112,13 +112,13 @@ class AccountPage extends StatelessWidget {
           child: StreamBuilder<DocumentSnapshot>(
               stream: _followerStream(),
               builder: (context, snapshot) {
-                var follower = 0;
+                int follower = 0;
                 if (snapshot.hasData) {
                   var filteredMap;
-                  if (snapshot.data.data == null) {
+                  if (snapshot.data!.data() == null) {
                     filteredMap = [];
                   } else {
-                    filteredMap = snapshot.data.data
+                    filteredMap = snapshot.data!.data() as Map<String, dynamic>
                       ..removeWhere((key, value) => value == false);
                   }
                   follower = filteredMap.length;
@@ -137,13 +137,13 @@ class AccountPage extends StatelessWidget {
           child: StreamBuilder<DocumentSnapshot>(
               stream: _followingStream(),
               builder: (context, snapshot) {
-                var following = 0;
+                int following = 0;
                 if (snapshot.hasData) {
                   var filteredMap;
-                  if (snapshot.data.data == null) {
+                  if (snapshot.data!.data() == null) {
                     filteredMap = [];
                   } else {
-                    filteredMap = snapshot.data.data
+                    filteredMap = snapshot.data!.data() as Map<String, dynamic>
                       ..removeWhere((key, value) => value == false);
                   }
                   following = filteredMap.length;
@@ -184,7 +184,7 @@ class AccountPage extends StatelessWidget {
 
   // 내 게시물 가져오기
   Stream<QuerySnapshot> _postStream() {
-    return Firestore.instance
+    return FirebaseFirestore.instance
         .collection('post')
         .where('email', isEqualTo: user.email)
         .snapshots();
@@ -192,17 +192,17 @@ class AccountPage extends StatelessWidget {
 
   // 팔로잉 가져오기
   Stream<DocumentSnapshot> _followingStream() {
-    return Firestore.instance
+    return FirebaseFirestore.instance
         .collection('following')
-        .document(user.email)
+        .doc(user.email)
         .snapshots();
   }
 
   // 팔로워 가져오기
   Stream<DocumentSnapshot> _followerStream() {
-    return Firestore.instance
+    return FirebaseFirestore.instance
         .collection('follower')
-        .document(user.email)
+        .doc(user.email)
         .snapshots();
   }
 }

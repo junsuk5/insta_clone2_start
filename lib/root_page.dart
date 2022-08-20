@@ -13,8 +13,8 @@ class RootPage extends StatelessWidget {
   }
 
   Widget _handleCurrentScreen() {
-    return StreamBuilder(
-      stream: FirebaseAuth.instance.onAuthStateChanged,
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         // 연결 상태가 기다리는 중이라면 로딩 페이지를 반환
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -22,7 +22,7 @@ class RootPage extends StatelessWidget {
         } else {
           // 연결 되었고 데이터가 있다면
           if (snapshot.hasData) {
-            return TabPage(snapshot.data);
+            return TabPage(snapshot.data!);
           }
           return LoginPage();
         }

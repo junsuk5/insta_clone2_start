@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'feed_widget.dart';
 
 class HomePage extends StatelessWidget {
-  final FirebaseUser user;
+  final User user;
 
   HomePage(this.user);
 
@@ -25,14 +25,13 @@ class HomePage extends StatelessWidget {
   Widget _buildBody() {
     return SafeArea(
       child: StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance.collection('post').snapshots(),
+          stream: FirebaseFirestore.instance.collection('post').snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return _buildNoPostBody();
             }
-            return _buildHasPostBody(snapshot.data.documents);
-          }
-      ),
+            return _buildHasPostBody(snapshot.data!.docs);
+          }),
     );
   }
 
@@ -63,15 +62,15 @@ class HomePage extends StatelessWidget {
                         width: 80.0,
                         height: 80.0,
                         child: CircleAvatar(
-                          backgroundImage: NetworkImage(user.photoUrl),
+                          backgroundImage: NetworkImage(user.photoURL!),
                         ),
                       ),
                       Padding(padding: EdgeInsets.all(8.0)),
                       Text(
-                        user.email,
+                        user.email!,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text(user.displayName),
+                      Text(user.displayName!),
                       Padding(padding: EdgeInsets.all(8.0)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -108,11 +107,10 @@ class HomePage extends StatelessWidget {
                       Padding(padding: EdgeInsets.all(4.0)),
                       Text('Facebook 친구'),
                       Padding(padding: EdgeInsets.all(4.0)),
-                      RaisedButton(
-                          color: Colors.blueAccent,
-                          textColor: Colors.white,
-                          child: Text('팔로우'),
-                          onPressed: () => print('팔로우 클릭')),
+                      ElevatedButton(
+                        child: Text('팔로우'),
+                        onPressed: () => print('팔로우 클릭'),
+                      ),
                       Padding(padding: EdgeInsets.all(4.0))
                     ],
                   ),
@@ -128,23 +126,22 @@ class HomePage extends StatelessWidget {
   // 게시물이 있을 경우에 표시한 body
   Widget _buildHasPostBody(List<DocumentSnapshot> documents) {
     // 내 게시물 5개
-    final myPosts = documents
-        .where((doc) => doc['email'] == user.email)
-        .take(5)
-        .toList();
+    final myPosts =
+        documents.where((doc) => doc['email'] == user.email).take(5).toList();
 
     // 다른 사람 게시물 10개
-    final otherPosts = documents
-        .where((doc) => doc['email'] != user.email)
-        .take(10)
-        .toList();
+    final otherPosts =
+        documents.where((doc) => doc['email'] != user.email).take(10).toList();
 
     // 합치기
     myPosts.addAll(otherPosts);
 
-    return ListView(
-      children: myPosts.map((doc) => FeedWidget(doc, user)).toList(),
-    );
+    return myPosts.length != 0
+        ? ListView(
+            children: myPosts.map((doc) => FeedWidget(doc, user)).toList(),
+          )
+        : Center(
+            child: Text('데이터가 없음'),
+          );
   }
-
 }

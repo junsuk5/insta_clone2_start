@@ -6,7 +6,7 @@ import 'account_page.dart';
 import 'home_page.dart';
 
 class TabPage extends StatefulWidget {
-  final FirebaseUser user;
+  final User user;
 
   TabPage(this.user);
 
@@ -17,7 +17,7 @@ class TabPage extends StatefulWidget {
 class _TabPageState extends State<TabPage> {
   int _selectedIndex = 0;
 
-  List _pages;
+  late List _pages;
 
   @override
   void initState() {
