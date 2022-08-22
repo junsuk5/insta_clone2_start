@@ -51,10 +51,11 @@ class DetailPostPage extends StatelessWidget {
                                   return Text('로딩중');
                                 }
 
-                                var data = snapshot.data!.data as Map<String, dynamic>;
-                                if (data[document['email']] == null ||
-                                    data[document['email']] == false
-                                ) {
+                                final data = snapshot.data!.data();
+
+                                if (data == null ||
+                                    (data as Map<String, dynamic>)[document['email']] == null ||
+                                    data[document['email']] == false) {
                                   return GestureDetector(
                                     onTap: _follow,
                                     child: Text(
@@ -75,8 +76,7 @@ class DetailPostPage extends StatelessWidget {
                                         fontWeight: FontWeight.bold),
                                   ),
                                 );
-                              }
-                          ),
+                              }),
                         ],
                       ),
                       Text(document['displayName']),
@@ -136,5 +136,4 @@ class DetailPostPage extends StatelessWidget {
         .doc(user.email)
         .snapshots();
   }
-
 }
